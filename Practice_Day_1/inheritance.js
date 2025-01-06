@@ -71,7 +71,7 @@ duck1.swim();
 class Animal{
     constructor(name){
         this.name = name;
-        console.log('I am an animal');
+        console.log(`I am ${name}`);
     }
 }
 
