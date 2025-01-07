@@ -98,3 +98,46 @@ var twoSum = function (nums, target) {
 };
 
 ```
+
+## Search in Rotated Sorted Array
+```
+var search = function(nums, target) {
+    for(let i=0 ,j=nums.length-1; i<=nums.length , j>=0; i++ , j--){
+        if(nums[i] == target){
+            return i
+        }
+        if(nums[j] == target){
+            return j
+        }
+    }
+    return -1
+};
+
+```
+
+## Merge Sorted Array
+
+
+```
+var merge = function(nums1, m, nums2, n) {
+    let i = m-1
+    let j = n-1
+    let k = m+n-1
+    while(i>=0 && j>=0){
+        if(nums1[i] > nums2[j]){
+            nums1[k] = nums1[i]
+            i--
+        }else{
+            nums1[k] = nums2[j]
+            j--
+        }
+        k--
+    }
+    while (j >= 0) {
+        nums1[k] = nums2[j];
+        j--;
+        k--;
+    }
+};
+
+```
