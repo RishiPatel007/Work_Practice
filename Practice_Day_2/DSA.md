@@ -141,3 +141,25 @@ var merge = function(nums1, m, nums2, n) {
 };
 
 ```
+
+
+
+## Maximum Subarray
+
+```
+var maxSubArray = function(nums) {
+    let current_sum = 0;
+    let max = Number.NEGATIVE_INFINITY
+
+    for(let i=0 ; i<nums.length ; i++){
+        current_sum +=nums[i]
+        max = Math.max(max , current_sum)
+
+        if(current_sum < 0){
+            current_sum = 0
+        }
+    }
+    return max
+};
+
+```
