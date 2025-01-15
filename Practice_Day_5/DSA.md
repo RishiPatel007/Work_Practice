@@ -1,4 +1,4 @@
-# Next 6 DSA Questions
+# Practice DSA Questions
 
 ## Roman To Integer
 
