@@ -114,6 +114,9 @@ var removeNodes = function(head) {
     return reverseList(head)
 };
 
+Time Complexity : O(n)
+Space Complexity : O(n)
+
 ```
 
 ## Valid Parentheses
@@ -139,6 +142,23 @@ var isValid = function(s) {
     }
     if(stack.length == 0) return true
     return false
+};
+
+```
+
+## Palindrome
+
+```
+var isPalindrome = function(x) {
+    x = x.toString()
+    let i=0
+    let j = x.length-1
+    while(i<j){
+        if(x[i] != x[j]) return false
+        i++
+        j--
+    }
+    return true
 };
 
 ```
