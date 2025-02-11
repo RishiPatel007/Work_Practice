@@ -1,16 +1,19 @@
 const readline = require("readline-sync");
 
 function printMatrix(map) {
+	console.log("   0   1   2   3   4 ");
+	console.log("  -----------------");
 	for (let i = 0; i < 5; i++) {
-		let line = "";
+		let line = `${i}|`;
 		for (let j = 0; j < 5; j++) {
 			let obj = map.get(`${i},${j}`);
-			line += obj.color.toUpperCase()[0] + (obj.haveQueen ? "# " : "  ");
+			line += ` ${obj.color.toUpperCase()[0]}${
+				obj.haveQueen ? "#" : " "
+			} `;
 		}
-		console.log("______________");
 		console.log(line);
 	}
-	console.log("______________");
+	console.log("  -----------------");
 }
 
 const map = new Map();
