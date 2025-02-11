@@ -42,16 +42,19 @@ for (let i = 0; i < 5; i++) {
 	let loc = readline.question("Enter location in form of i,j : ");
 	let obj = map.get(loc);
 
-	while (
-		regionOccupied.includes(obj.color) ||
-		rowOccupied.includes(loc[0]) ||
-		columnOccupied.includes(loc[2]) ||
-		edgeOccupied.includes(loc)
-	) {
-		loc = readline.question(
-			"Wrong! Enter location in form of i,j AGAIN!!! : "
-		);
-		obj = map.get(loc);
+	while (true) {
+		if (
+			regionOccupied.includes(obj.color) ||
+			rowOccupied.includes(loc[0]) ||
+			columnOccupied.includes(loc[2]) ||
+			edgeOccupied.includes(loc)
+		) {
+			loc = readline.question(
+				"Wrong Enter location in form of i,j AGAIN!!! : "
+			);
+		} else {
+			break;
+		}
 	}
 
 	regionOccupied.push(obj.color);
