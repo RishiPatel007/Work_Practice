@@ -19,82 +19,102 @@ function printMatrix(map) {
 	console.log("______________");
 }
 
-const map = new Map();
-let regionOccupied = [];
-let rowOccupied = [];
-let columnOccupied = [];
-let edgeOccupied = [];
+function checkValidityOfCell(obj, loc, region, row, column, edge) {
+	return (
+		region.includes(obj.color) ||
+		row.includes(loc[0]) ||
+		column.includes(loc[2]) ||
+		edge.includes(loc)
+	);
+}
 
-map.set("0,0", { color: "green", haveQueen: false });
-map.set("0,1", { color: "green", haveQueen: false });
-map.set("0,2", { color: "red", haveQueen: false });
-map.set("0,3", { color: "red", haveQueen: false });
-map.set("0,4", { color: "purple", haveQueen: false });
+function makeBoard() {
+	const map = new Map();
+	let colors = [
+		["green", "green", "red", "red", "purple"],
+		["green", "green", "red", "red", "purple"],
+		["green", "blue", "blue", "red", "purple"],
+		["green", "blue", "yellow", "yellow", "yellow"],
+		["blue", "blue", "yellow", "yellow", "yellow"],
+	];
 
-map.set("1,0", { color: "green", haveQueen: false });
-map.set("1,1", { color: "green", haveQueen: false });
-map.set("1,2", { color: "red", haveQueen: false });
-map.set("1,3", { color: "red", haveQueen: false });
-map.set("1,4", { color: "purple", haveQueen: false });
+	for (let i = 0; i < 5; i++) {
+		for (let j = 0; j < 5; j++) {
+			map.set(`${i},${j}`, { color: colors[i][j], haveQueen: false });
+		}
+	}
+	return map;
+}
 
-map.set("2,0", { color: "green", haveQueen: false });
-map.set("2,1", { color: "blue", haveQueen: false });
-map.set("2,2", { color: "blue", haveQueen: false });
-map.set("2,3", { color: "red", haveQueen: false });
-map.set("2,4", { color: "purple", haveQueen: false });
+function updateValidity(obj, loc, region, row, column, edge) {
+	region.push(obj.color);
+	row.push(loc[0]);
+	column.push(loc[2]);
 
-map.set("3,0", { color: "green", haveQueen: false });
-map.set("3,1", { color: "blue", haveQueen: false });
-map.set("3,2", { color: "yellow", haveQueen: false });
-map.set("3,3", { color: "yellow", haveQueen: false });
-map.set("3,4", { color: "yellow", haveQueen: false });
+	let arr = [
+		[loc[0] - 1, loc[2] - 1],
+		[loc[0] - 1, parseInt(loc[2]) + 1],
+		[parseInt(loc[0]) + 1, loc[2] - 1],
+		[parseInt(loc[0]) + 1, parseInt(loc[2]) + 1],
+	];
 
-map.set("4,0", { color: "blue", haveQueen: false });
-map.set("4,1", { color: "blue", haveQueen: false });
-map.set("4,2", { color: "yellow", haveQueen: false });
-map.set("4,3", { color: "yellow", haveQueen: false });
-map.set("4,4", { color: "yellow", haveQueen: false });
+	for ([x, y] of arr) {
+		if (x != -1 && x != 5 && y != -1 && y != 5) {
+			edge.push(`${x},${y}`);
+		}
+	}
+}
 
-printMatrix(map);
-
-let bool = true;
-for (let i = 0; i < 5; i++) {
-	let loc = readline.question("Enter location in form of i,j : ");
+function askQuestionsTillTrue(map , region, row, column, edge) {
 	let obj;
+	let loc;
 	while (true) {
+		if (!loc) {
+			loc = readline.question("Enter location in form of i,j : ");
+		} else {
+			loc = readline.question("Wrong !!! Try Again : ");
+		}
 		obj = map.get(loc);
 		if (
-			regionOccupied.includes(obj.color) ||
-			rowOccupied.includes(loc[0]) ||
-			columnOccupied.includes(loc[2]) ||
-			edgeOccupied.includes(loc)
+			!checkValidityOfCell(
+				obj,
+				loc,
+				region,
+				row,
+				column,
+				edge
+			)
 		) {
-			loc = readline.question(
-				"Wrong Enter location in form of i,j AGAIN!!! : "
-			);
-		} else {
 			break;
 		}
 	}
-	let arr = [];
-	regionOccupied.push(obj.color);
-	rowOccupied.push(loc[0]);
-	columnOccupied.push(loc[2]);
-	arr.push([loc[0] - 1, loc[2] - 1]);
-	arr.push([loc[0] - 1, parseInt(loc[2]) + 1]);
-	arr.push([parseInt(loc[0]) + 1, loc[2] - 1]);
-	arr.push([parseInt(loc[0]) + 1, parseInt(loc[2]) + 1]);
-	for (x of arr) {
-		if (x[0] != -1 && x[0] != 5 && x[1] != -1 && x[1] != 5) {
-			edgeOccupied.push(`${x[0]},${x[1]}`);
-		}
-	}
-	map.set(loc, { ...obj, haveQueen: true });
+	return {obj , loc}
+}
+
+function startGame() {
+	let regionOccupied = [];
+	let rowOccupied = [];
+	let columnOccupied = [];
+	let edgeOccupied = [];
+
+	const map = makeBoard();
 
 	printMatrix(map);
-}
-if (bool) {
+	for (let i = 0; i < 5; i++) {
+		let {obj , loc} = askQuestionsTillTrue(map , regionOccupied , rowOccupied , columnOccupied , edgeOccupied)
+		updateValidity(
+			obj,
+			loc,
+			regionOccupied,
+			rowOccupied,
+			columnOccupied,
+			edgeOccupied
+		);
+		map.set(loc, { ...obj, haveQueen: true });
+
+		printMatrix(map);
+	}
 	console.log("You are correct");
-} else {
-	console.log("Wrong");
 }
+
+startGame();
