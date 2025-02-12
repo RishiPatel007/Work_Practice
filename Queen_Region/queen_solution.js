@@ -25,43 +25,44 @@ let rowOccupied = [];
 let columnOccupied = [];
 let edgeOccupied = [];
 
-map.set(`0,0`, { color: "green", haveQueen: false });
-map.set(`0,1`, { color: "green", haveQueen: false });
-map.set(`0,2`, { color: "red", haveQueen: false });
-map.set(`0,3`, { color: "red", haveQueen: false });
-map.set(`0,4`, { color: "purple", haveQueen: false });
+map.set("0,0", { color: "green", haveQueen: false });
+map.set("0,1", { color: "green", haveQueen: false });
+map.set("0,2", { color: "red", haveQueen: false });
+map.set("0,3", { color: "red", haveQueen: false });
+map.set("0,4", { color: "purple", haveQueen: false });
 
-map.set(`1,0`, { color: "green", haveQueen: false });
-map.set(`1,1`, { color: "green", haveQueen: false });
-map.set(`1,2`, { color: "red", haveQueen: false });
-map.set(`1,3`, { color: "red", haveQueen: false });
-map.set(`1,4`, { color: "purple", haveQueen: false });
+map.set("1,0", { color: "green", haveQueen: false });
+map.set("1,1", { color: "green", haveQueen: false });
+map.set("1,2", { color: "red", haveQueen: false });
+map.set("1,3", { color: "red", haveQueen: false });
+map.set("1,4", { color: "purple", haveQueen: false });
 
-map.set(`2,0`, { color: "green", haveQueen: false });
-map.set(`2,1`, { color: "blue", haveQueen: false });
-map.set(`2,2`, { color: "blue", haveQueen: false });
-map.set(`2,3`, { color: "red", haveQueen: false });
-map.set(`2,4`, { color: "purple", haveQueen: false });
+map.set("2,0", { color: "green", haveQueen: false });
+map.set("2,1", { color: "blue", haveQueen: false });
+map.set("2,2", { color: "blue", haveQueen: false });
+map.set("2,3", { color: "red", haveQueen: false });
+map.set("2,4", { color: "purple", haveQueen: false });
 
-map.set(`3,0`, { color: "green", haveQueen: false });
-map.set(`3,1`, { color: "blue", haveQueen: false });
-map.set(`3,2`, { color: "yellow", haveQueen: false });
-map.set(`3,3`, { color: "yellow", haveQueen: false });
-map.set(`3,4`, { color: "yellow", haveQueen: false });
+map.set("3,0", { color: "green", haveQueen: false });
+map.set("3,1", { color: "blue", haveQueen: false });
+map.set("3,2", { color: "yellow", haveQueen: false });
+map.set("3,3", { color: "yellow", haveQueen: false });
+map.set("3,4", { color: "yellow", haveQueen: false });
 
-map.set(`4,0`, { color: "blue", haveQueen: false });
-map.set(`4,1`, { color: "blue", haveQueen: false });
-map.set(`4,2`, { color: "yellow", haveQueen: false });
-map.set(`4,3`, { color: "yellow", haveQueen: false });
-map.set(`4,4`, { color: "yellow", haveQueen: false });
+map.set("4,0", { color: "blue", haveQueen: false });
+map.set("4,1", { color: "blue", haveQueen: false });
+map.set("4,2", { color: "yellow", haveQueen: false });
+map.set("4,3", { color: "yellow", haveQueen: false });
+map.set("4,4", { color: "yellow", haveQueen: false });
 
 printMatrix(map);
 
 let bool = true;
 for (let i = 0; i < 5; i++) {
 	let loc = readline.question("Enter location in form of i,j : ");
-	let obj = map.get(loc);
+	let obj;
 	while (true) {
+		obj = map.get(loc);
 		if (
 			regionOccupied.includes(obj.color) ||
 			rowOccupied.includes(loc[0]) ||
