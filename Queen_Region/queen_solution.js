@@ -28,22 +28,9 @@ function checkValidityOfCell(obj, loc, region, row, column, edge) {
 	);
 }
 
-function makeBoard() {
-	const map = new Map();
-	let colors = [
-		["green", "green", "red", "red", "purple"],
-		["green", "green", "red", "red", "purple"],
-		["green", "blue", "blue", "red", "purple"],
-		["green", "blue", "yellow", "yellow", "yellow"],
-		["blue", "blue", "yellow", "yellow", "yellow"],
-	];
 
-	for (let i = 0; i < 5; i++) {
-		for (let j = 0; j < 5; j++) {
-			map.set(`${i},${j}`, { color: colors[i][j], haveQueen: false });
-		}
-	}
-	return map;
+function checkEdgeValidity(edges, loc) {
+	return edges.includes(loc);
 }
 
 function updateValidity(obj, loc, region, row, column, edge) {
@@ -65,7 +52,20 @@ function updateValidity(obj, loc, region, row, column, edge) {
 	}
 }
 
-function askQuestionsTillTrue(map , region, row, column, edge) {
+function updateEdgeValidity(markedEdges, row, col) {
+	let arr = [
+		[row + 1, col + 1],
+		[row - 1, col + 1],
+	];
+
+	for (let [x, y] of arr) {
+		if (x != -1 && x != 5 && y != -1 && y != 5) {
+			markedEdges.push(`${x},${y}`);
+		}
+	}
+}
+
+function askQuestionsTillTrue(map, region, row, column, edge) {
 	let obj;
 	let loc;
 	while (true) {
@@ -75,20 +75,124 @@ function askQuestionsTillTrue(map , region, row, column, edge) {
 			loc = readline.question("Wrong !!! Try Again : ");
 		}
 		obj = map.get(loc);
-		if (
-			!checkValidityOfCell(
-				obj,
-				loc,
-				region,
-				row,
-				column,
-				edge
-			)
-		) {
+		if (!checkValidityOfCell(obj, loc, region, row, column, edge)) {
 			break;
 		}
 	}
-	return {obj , loc}
+	return { obj, loc };
+}
+
+function makeNullMatrix() {
+	let matrix = [];
+	for (let i = 0; i < 5; i++) {
+		let arr = [];
+		for (let j = 0; j < 5; j++) {
+			arr.push(null);
+		}
+		matrix.push(arr);
+	}
+	return matrix;
+}
+
+function indexFromPosition(num) {
+	return [Math.floor(num / 5), num % 5];
+}
+
+function addColorFromBoundry(matrix, cell) {
+	let [row, col] = indexFromPosition(cell);
+	let boundries = [
+		[row - 1, col],
+		[row, col + 1],
+		[row + 1, col],
+		[row, col - 1],
+	];
+
+	let tempColor = [];
+	for ([x, y] of boundries) {
+		if (x >= 0 && x < 5 && y >= 0 && y < 5 && matrix[x][y] != null) {
+			tempColor.push(matrix[x][y]);
+		}
+	}
+	if (tempColor.length != 0) {
+		matrix[row][col] =
+			tempColor[Math.floor(Math.random() * tempColor.length)];
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function generateRandomSolutionWithoutRegions(
+	matrix,
+	availableRows,
+	markedEdges,
+	colors
+) {
+	for (let col = 0; col < 5; col++) {
+		let row;
+		while (true) {
+			index = Math.floor(Math.random() * availableRows.length);
+			row = availableRows[index];
+			loc = `${row},${col}`;
+			if (!checkEdgeValidity(markedEdges, loc)) {
+				availableRows.splice(index, 1);
+				updateEdgeValidity(markedEdges, row, col);
+				break;
+			}
+		}
+		matrix[row][col] = colors.pop();
+	}
+}
+
+function insertRegions(matrix , availablePosition) {
+	while (availablePosition.length > 0) {
+		let cellIndex = Math.floor(Math.random() * availablePosition.length);
+		let cell = availablePosition[cellIndex];
+		let [cellRow, cellCol] = indexFromPosition(cell);
+		if (matrix[cellRow][cellCol] != null) {
+			availablePosition.splice(cellIndex, 1);
+			continue;
+		}
+		if (addColorFromBoundry(matrix, cell)) {
+			availablePosition.splice(cellIndex, 1);
+		}
+	}
+}
+
+function getRandomBoard() {
+	let matrix = makeNullMatrix();
+	let availableRows = [0, 1, 2, 3, 4];
+	let markedEdges = [];
+	let availablePosition = [];
+	let colors = ["green", "blue", "red", "white", "yellow"];
+	for (let i = 0; i < 25; i++) {
+		availablePosition.push(i);
+	}
+
+	generateRandomSolutionWithoutRegions(
+		matrix,
+		availableRows,
+		markedEdges,
+		colors
+	);
+	console.log("SOLUTION FOR THIS RANDOM PUZZLE")
+	console.log(matrix);
+
+	insertRegions(matrix , availablePosition);
+	return matrix;
+}
+
+
+function makeBoard() {
+	const map = new Map();
+	let colors = getRandomBoard();
+
+	for (let i = 0; i < 5; i++) {
+		for (let j = 0; j < 5; j++) {
+			map.set(`${i},${j}`, { color: colors[i][j], haveQueen: false });
+		}
+	}
+	return map;
 }
 
 function startGame() {
@@ -101,7 +205,13 @@ function startGame() {
 
 	printMatrix(map);
 	for (let i = 0; i < 5; i++) {
-		let {obj , loc} = askQuestionsTillTrue(map , regionOccupied , rowOccupied , columnOccupied , edgeOccupied)
+		let { obj, loc } = askQuestionsTillTrue(
+			map,
+			regionOccupied,
+			rowOccupied,
+			columnOccupied,
+			edgeOccupied
+		);
 		updateValidity(
 			obj,
 			loc,
@@ -118,3 +228,4 @@ function startGame() {
 }
 
 startGame();
+// findSolution();
