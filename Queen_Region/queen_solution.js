@@ -33,9 +33,9 @@ function printSolutionMatrix(matrix) {
 	}
 }
 function printMatrix(map) {
-	let line = "    ";
+	let line = "     ";
 	for (let i = 0; i < gridSize; i++) {
-		line += i + "  ";
+		line += i + "      ";
 	}
 	console.log(line);
 
@@ -44,37 +44,37 @@ function printMatrix(map) {
 		line += i + " | ";
 		for (let j = 0; j < gridSize; j++) {
 			let obj = map.get(`${i},${j}`);
-			line += obj.color.toUpperCase()[0];
+			line += obj.color;
 			if (obj.haveQueen) {
-				line += "#";
+				line += "👑";
 			} else {
-				line += " ";
+				line += "  ";
 			}
-			line += " ";
+			line += "   ";
 		}
-		console.log("____________________________");
+		console.log();
 		console.log(line);
 	}
-	console.log("____________________________");
+	console.log();
 }
 
 function checkValidityOfCell(obj, loc, region, row, column, edge) {
 	return (
-		region.includes(obj.color) ||
-		row.includes(loc[0]) ||
-		column.includes(loc[2]) ||
-		edge.includes(loc)
+		region.has(obj.color) ||
+		row.has(loc[0]) ||
+		column.has(loc[2]) ||
+		edge.has(loc)
 	);
 }
 
 function checkEdgeValidity(edges, loc) {
-	return edges.includes(loc);
+	return edges.has(loc);
 }
 
 function updateValidity(obj, loc, region, row, column, edge) {
-	region.push(obj.color);
-	row.push(loc[0]);
-	column.push(loc[2]);
+	region.add(obj.color);
+	row.add(loc[0]);
+	column.add(loc[2]);
 
 	let arr = [
 		[loc[0] - 1, loc[2] - 1],
@@ -85,7 +85,7 @@ function updateValidity(obj, loc, region, row, column, edge) {
 
 	for ([x, y] of arr) {
 		if (x != -1 && x != gridSize && y != -1 && y != gridSize) {
-			edge.push(`${x},${y}`);
+			edge.add(`${x},${y}`);
 		}
 	}
 }
@@ -98,7 +98,7 @@ function updateEdgeValidity(markedEdges, row, col) {
 
 	for (let [x, y] of arr) {
 		if (x != -1 && x != gridSize && y != -1 && y != gridSize) {
-			markedEdges.push(`${x},${y}`);
+			markedEdges.add(`${x},${y}`);
 		}
 	}
 }
@@ -145,7 +145,7 @@ function addColorFromBoundry(matrix, cell) {
 		[row, col - 1],
 	];
 
-	let tempColor = [];
+	let tempColor = new Set();
 	for ([x, y] of boundries) {
 		if (
 			x >= 0 &&
@@ -154,12 +154,13 @@ function addColorFromBoundry(matrix, cell) {
 			y < gridSize &&
 			matrix[x][y] != null
 		) {
-			tempColor.push(matrix[x][y]);
+			tempColor.add(matrix[x][y]);
 		}
 	}
-	if (tempColor.length != 0) {
+	let uniqueColor = [...tempColor];
+	if (uniqueColor.length != 0) {
 		matrix[row][col] =
-			tempColor[Math.floor(Math.random() * tempColor.length)];
+			uniqueColor[Math.floor(Math.random() * uniqueColor.length)];
 		return true;
 	} else {
 		return false;
@@ -219,19 +220,9 @@ function getRandomBoard() {
 			availableRows.push(i);
 		}
 
-		let markedEdges = [];
+		let markedEdges = new Set();
 		availablePosition = [];
-		let colors = [
-			"green",
-			"blue",
-			"red",
-			"white",
-			"yellow",
-			"purple",
-			"navy",
-			"silver",
-			"magenta",
-		];
+		let colors = ["⬛", "🟧", "🟪", "🟫", "⬜", "🟦", "🟥", "🟨", "🟩"];
 		for (let i = 0; i < gridSize * gridSize; i++) {
 			availablePosition.push(i);
 		}
@@ -267,10 +258,10 @@ function makeBoard() {
 }
 
 function startGame() {
-	let regionOccupied = [];
-	let rowOccupied = [];
-	let columnOccupied = [];
-	let edgeOccupied = [];
+	let regionOccupied = new Set();
+	let rowOccupied = new Set();
+	let columnOccupied = new Set();
+	let edgeOccupied = new Set();
 	while (true) {
 		gridSize = parseInt(
 			readline.question("Please enter grid size between 5 to 9 : ")
@@ -302,8 +293,7 @@ function startGame() {
 
 		printMatrix(map);
 	}
-	console.log("You are correct");
+	console.log("👑👑👑👑👑👑👑👑👑👑👑👑👑 CONGRATULATIONS YOU ARE CORRECT 👑👑👑👑👑👑👑👑👑👑👑👑");
 }
 let gridSize;
 startGame();
-// findSolution();
