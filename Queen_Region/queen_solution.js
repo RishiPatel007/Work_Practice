@@ -3,23 +3,35 @@ const readline = require("readline-sync");
 function printSolutionMatrix(matrix) {
 	const cellWidth = 12;
 	const emptyCell = " ".repeat(cellWidth);
+	const numRows = matrix.length;
+	const numCols = matrix[0].length;
 
-	const rowSeparator = "-".repeat(matrix[0].length * (cellWidth + 3));
+	// Print column indices
+	const colIndices = Array.from({ length: numCols }, (_, i) =>
+		i.toString().padStart(cellWidth)
+	);
+	console.log(" ".repeat(6) + colIndices.join(" | "));
 
-	for (let row of matrix) {
+	// Print row separator
+	const rowSeparator = "-".repeat(numCols * (cellWidth + 3));
+	console.log(rowSeparator);
+
+	// Print matrix with row indices
+	for (let i = 0; i < numRows; i++) {
+		const rowLabel = i.toString().padEnd(6); // Row index padding
 		console.log(
-			row
-				.map((cell) =>
-					cell === null
-						? emptyCell
-						: cell.toString().padStart(cellWidth)
-				)
-				.join(" | ")
+			rowLabel +
+				matrix[i]
+					.map((cell, j) =>
+						cell === null
+							? emptyCell
+							: `(${i},${j}) ${cell}`.padStart(cellWidth)
+					)
+					.join(" | ")
 		);
 		console.log(rowSeparator);
 	}
 }
-
 function printMatrix(map) {
 	let line = "    ";
 	for (let i = 0; i < gridSize; i++) {
@@ -89,7 +101,6 @@ function updateEdgeValidity(markedEdges, row, col) {
 			markedEdges.push(`${x},${y}`);
 		}
 	}
-	console.log(markedEdges)
 }
 
 function askQuestionsTillTrue(map, region, row, column, edge) {
@@ -163,28 +174,24 @@ function generateRandomSolutionWithoutRegions(
 ) {
 	for (let col = 0; col < gridSize; col++) {
 		let row;
-		let attempts = 0
+		let attempts = 0;
 		while (true) {
-			if(attempts ==10){
-				console.log("returning false")
-				return false
+			if (attempts == 10) {
+				return false;
 			}
 			index = Math.floor(Math.random() * availableRows.length);
 			row = availableRows[index];
 			loc = `${row},${col}`;
 			if (!checkEdgeValidity(markedEdges, loc)) {
-				console.log(loc)
-				console.log(availableRows)
 				availableRows.splice(index, 1);
 				updateEdgeValidity(markedEdges, row, col);
 				break;
 			}
-			attempts++
+			attempts++;
 		}
-		console.log(row , col)
 		matrix[row][col] = colors.pop();
 	}
-	return true
+	return true;
 }
 
 function insertRegions(matrix, availablePosition) {
@@ -205,13 +212,13 @@ function insertRegions(matrix, availablePosition) {
 function getRandomBoard() {
 	let matrix;
 	let availablePosition;
-	while(true){
+	while (true) {
 		matrix = makeNullMatrix();
 		let availableRows = [];
 		for (let i = 0; i < gridSize; i++) {
 			availableRows.push(i);
 		}
-	
+
 		let markedEdges = [];
 		availablePosition = [];
 		let colors = [
@@ -228,16 +235,18 @@ function getRandomBoard() {
 		for (let i = 0; i < gridSize * gridSize; i++) {
 			availablePosition.push(i);
 		}
-		if(generateRandomSolutionWithoutRegions(
-			matrix,
-			availableRows,
-			markedEdges,
-			colors
-		)){
-			break
+		if (
+			generateRandomSolutionWithoutRegions(
+				matrix,
+				availableRows,
+				markedEdges,
+				colors
+			)
+		) {
+			break;
 		}
 	}
-	
+
 	console.log("SOLUTION FOR THIS RANDOM PUZZLE");
 	printSolutionMatrix(matrix);
 
