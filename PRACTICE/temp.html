@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Event Listeners in JavaScript</title>
+		<style>
+			* {
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+			}
+
+			.body {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				margin: 0px;
+			}
+
+			.card {
+				border: 4px solid black;
+				border-radius: 5%;
+				padding: 20px;
+				width: 70vw;
+				height: auto;
+				max-width: 500px;
+				text-align: center;
+			}
+
+			.title {
+				border: 3px solid black;
+				border-radius: 20%;
+				font-size: 25px;
+			}
+
+			.button {
+				background: lightgray;
+				border: 2px solid black;
+				border-radius: 15%;
+				font-weight: 600;
+				font-size: medium;
+				height: 30px;
+				margin-right: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<script>
+			function randomColor() {
+				let red = Math.floor(Math.random() * 255);
+				let green = Math.floor(Math.random() * 255);
+				let blue = Math.floor(Math.random() * 255);
+
+				return { red, green, blue };
+			}
+
+			let div = document.createElement("div");
+			document.body.appendChild(div);
+			document.body.classList.add("body");
+
+			div.classList.add("card");
+
+			let title = document.createElement("h3");
+			title.classList.add("title");
+			title.style.margin = "0px";
+			title.textContent = "------- Title -------";
+
+			div.appendChild(title);
+
+			let description = document.createElement("p");
+			description.textContent =
+				"Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos facilis reiciendis eligendi sunt modi sequi veniam aut fugit voluptate illo?";
+
+			description.classList.add("description");
+
+			div.appendChild(description);
+
+			let button = document.createElement("button");
+			let anotherButton = document.createElement("button");
+
+			button.textContent = "Change Background";
+			anotherButton.textContent = "Change Text";
+
+			button.classList.add("button");
+			anotherButton.classList.add("button");
+
+			div.appendChild(button);
+			div.appendChild(anotherButton);
+
+			let isDivColored = false;
+			let originalDivColor = div.style.background;
+			button.addEventListener("click", function () {
+				if (isDivColored) {
+					div.style.background = originalDivColor;
+					isDivColored = false;
+					button.textContent = "Change Background";
+				} else {
+					let { red, green, blue } = randomColor();
+					div.style.background = `rgb(${red},${green},${blue})`;
+					isDivColored = true;
+					button.textContent = "Remove Background";
+				}
+			});
+
+			let isTextColored = false;
+			let originalTextColor = "black";
+			anotherButton.addEventListener("click", function () {
+				if (isTextColored) {
+					div.style.color = originalTextColor;
+					isTextColored = false;
+					anotherButton.textContent = "Change Text Color";
+				} else {
+					let { red, green, blue } = randomColor();
+					div.style.color = `rgb(${red},${green},${blue})`;
+					isTextColored = true;
+					anotherButton.textContent = "Remove Text Color";
+				}
+			});
+		</script>
+	</body>
+</html>

@@ -1,38 +1,10 @@
-const readline = require("readline-sync");
-function printMatrix(map) {
-	let line = "     ";
-	for (let i = 0; i < gridSize; i++) {
-		line += i + "      ";
-	}
-	console.log(line);
-
-	for (let i = 0; i < gridSize; i++) {
-		let line = "";
-		line += i + " | ";
-		for (let j = 0; j < gridSize; j++) {
-			let obj = map.get(`${i},${j}`);
-			line += obj.color;
-			if (obj.haveQueen) {
-				line += "👑";
-			} else {
-				line += "  ";
-			}
-			line += "   ";
-		}
-		console.log();
-		console.log(line);
-	}
-	console.log();
-}
-
 function removeOneFromArray(arr, value) {
-    let index = arr.indexOf(value);
-    if (index !== -1) {
-        arr.splice(index, 1);
-    }
-    return arr;
+	let index = arr.indexOf(value);
+	if (index !== -1) {
+		arr.splice(index, 1);
+	}
+	return arr;
 }
-
 
 function checkValidityOfCell(obj, loc, region, row, column, edge) {
 	return (
@@ -71,7 +43,7 @@ function printSolutionMatrix(matrix) {
 	const emptyCell = " ".repeat(cellWidth);
 	const numRows = matrix.length;
 	const numCols = matrix[0].length;
-
+	``;
 	const colIndices = Array.from({ length: numCols }, (_, i) =>
 		i.toString().padStart(cellWidth)
 	);
@@ -109,57 +81,37 @@ function updateEdgeValidity(markedEdges, row, col) {
 	}
 }
 
-
-function removeCell(cell , map , region , row , column , edge){
-	let r = cell[0]
-	let c = cell[1]
-	let x = map.get(`${r},${c}`)
-	x.haveQueen = false
-	totalQueen--
-	row.delete(`${r}`)
-	column.delete(`${c}`)
-	region.delete(x.color)
-
-	let edge1 = `${r-1},${c-1}`
-	let edge2 = `${r+1},${c+1}`
-	let edge3 = `${r-1},${c+1}`
-	let edge4 = `${r+1},${c-1}`
-
-	removeOneFromArray(edge , edge1)
-	removeOneFromArray(edge , edge2)
-	removeOneFromArray(edge , edge3)
-	removeOneFromArray(edge , edge4)
+function removeCell(cell, map, region, row, column, edges) {
+	let r = parseInt(cell[0]);
+	let c = parseInt(cell[1]);
+	let x = map.get(`${r},${c}`);
+	x.haveQueen = false;
+	totalQueen--;
+	row.delete(`${r}`);
+	column.delete(`${c}`);
+	region.delete(x.color);
+	let removeEdges = [
+		`${r - 1},${c - 1}`,
+		`${r + 1},${c + 1}`,
+		`${r - 1},${c + 1}`,
+		`${r + 1},${c - 1}`,
+	];
+	for (let edge of removeEdges) {
+		removeOneFromArray(edges, edge);
+	}
 }
 
-
-function askQuestionsTillTrue(map, region, row, column, edge) {
+function askQuestionsTillTrue(map, region, row, column, edge, id) {
 	let obj;
-	let loc;
-	while (true) {
-		if (!loc) {
-			loc = readline.question(
-				"Enter location in form of i,j (or type hint to get a hint!!!): "
-			);
-			if (loc == "hint") {
-				let deleteCells = getHint();
-				for(cell of deleteCells){
-					removeCell(cell , map , region , row , column , edge)
-				}
-				console.log("You were right upto this point");
-				printMatrix(map);
-				console.log("Try adding :",hintArray[totalQueen])
-				loc = "";
-				continue;
-			}
-		} else {
-			loc = readline.question("Wrong !!! Try Again : ");
-		}
-		obj = map.get(loc);
-		if (!checkValidityOfCell(obj, loc, region, row, column, edge)) {
-			break;
-		}
+	let loc = id;
+	let queenPlaced = false;
+
+	obj = map.get(loc);
+	if (!checkValidityOfCell(obj, loc, region, row, column, edge)) {
+		queenPlaced = true;
 	}
-	return { obj, loc };
+
+	return { obj, loc, queenPlaced };
 }
 
 function makeNullMatrix() {
@@ -264,7 +216,17 @@ function getRandomBoard() {
 
 		let markedEdges = [];
 		availablePosition = [];
-		let colors = ["⬛", "🟧", "🟪", "🟫", "⬜", "🟦", "🟥", "🟨", "🟩"];
+		let colors = [
+			"orange",
+			"purple",
+			"teal",
+			"cyan",
+			"lavender",
+			"blue",
+			"red",
+			"yellow",
+			"green",
+		];
 		for (let i = 0; i < gridSize * gridSize; i++) {
 			availablePosition.push(i);
 		}
@@ -306,7 +268,7 @@ function getHint() {
 		for (let row = 0; row < gridSize; row++) {
 			let x = map.get(`${row},${col}`);
 			if (copyArray[row][col] != null) {
-				hintArray.push([row , col])
+				hintArray.push([row, col]);
 			}
 			if (x.haveQueen) {
 				if (copyArray[row][col] == null && !bool) {
@@ -319,53 +281,139 @@ function getHint() {
 			}
 		}
 	}
-	return removeArray
+	return removeArray;
 }
 
-function startGame() {
-	let regionOccupied = new Set();
-	let rowOccupied = new Set();
-	let columnOccupied = new Set();
-	let edgeOccupied = [];
-	while (true) {
-		gridSize = parseInt(
-			readline.question("Please enter grid size between 5 to 9 : ")
-		);
-		if (gridSize >= 5 && gridSize <= 9) {
-			break;
+function handleCellClick(event) {
+	if (event.target.className == "cell") {
+		let id = event.target.id;
+		if (map.get(id).haveQueen) {
+			removeCell(
+				[id[0], id[2]],
+				map,
+				regionOccupied,
+				rowOccupied,
+				columnOccupied,
+				edgeOccupied
+			);
+			event.target.innerHTML = "";
+			return;
 		}
-	}
-	map = makeBoard();
-
-	printMatrix(map);
-	while(totalQueen <gridSize) {
-		let { obj, loc } = askQuestionsTillTrue(
+		let { obj, loc, queenPlaced } = askQuestionsTillTrue(
 			map,
 			regionOccupied,
 			rowOccupied,
 			columnOccupied,
-			edgeOccupied
+			edgeOccupied,
+			id
 		);
-		updateValidity(
-			obj,
-			loc,
-			regionOccupied,
-			rowOccupied,
-			columnOccupied,
-			edgeOccupied
-		);
-		map.set(loc, { ...obj, haveQueen: true });
-		totalQueen++
-		printMatrix(map);
+		// This function is checking until user entered proper queen
+		if (queenPlaced) {
+			updateValidity(
+				obj,
+				loc,
+				regionOccupied,
+				rowOccupied,
+				columnOccupied,
+				edgeOccupied
+			);
+			map.set(loc, { ...obj, haveQueen: true });
+			totalQueen++;
+			event.target.textContent = "👑";
+			messageBox.textContent = "";
+		} else {
+			messageBox.style.color = "red";
+			messageBox.textContent = "! You cannot place a queen there !";
+		}
 	}
-	console.log(
-		"👑👑👑👑👑👑👑👑👑👑👑👑👑 CONGRATULATIONS YOU ARE CORRECT 👑👑👑👑👑👑👑👑👑👑👑👑"
-	);
+	if (totalQueen == gridSize) {
+		messageBox.textContent = "! Congratulation You Win !";
+		messageBox.style.color = "green";
+		board.removeEventListener("click", handleCellClick);
+		hintButton.removeEventListener("click", handleHint);
+	}
 }
+
+function startGame() {
+	resetBoard();
+	messageBox.textContent = "";
+	board.style.height = inputBox.value * 65 + "px";
+	board.style.width = inputBox.value * 65 + "px";
+	gridSize = inputBox.value;
+	map = makeBoard();
+	board.addEventListener("click", handleCellClick);
+	hintButton.addEventListener("click" , handleHint);
+	updateBoard();
+}
+let regionOccupied = new Set();
+let rowOccupied = new Set();
+let columnOccupied = new Set();
+let edgeOccupied = [];
 let map;
 let gridSize;
 let copyArray;
 let totalQueen = 0;
-let hintArray = []
-startGame();
+let hintArray = [];
 
+// Taking input from the user :
+
+function updateBoard() {
+	board.innerHTML = "";
+	for (let i = 0; i < gridSize; i++) {
+		let row = document.createElement("div");
+		row.className = "row";
+		for (let j = 0; j < gridSize; j++) {
+			let obj = map.get(`${i},${j}`);
+
+			let cell = document.createElement("div");
+			cell.classList.add("cell");
+			cell.style.background = obj.color;
+			cell.id = `${i},${j}`;
+			if(obj.haveQueen){
+				cell.textContent = "👑"
+			}
+			row.appendChild(cell);
+		}
+		board.appendChild(row);
+	}
+}
+
+function resetBoard() {
+	map = undefined;
+	gridSize = undefined;
+	copyArray = undefined;
+	totalQueen = 0;
+	hintArray = [];
+	board.innerHTML = "";
+	regionOccupied = new Set();
+	rowOccupied = new Set();
+	columnOccupied = new Set();
+	edgeOccupied = [];
+}
+
+function handleUserInput() {
+	if (inputBox.value >= 5 && inputBox.value <= 9) {
+		startGame();
+	} else {
+		messageBox.textContent = "Please enter number between 5 and 9";
+		messageBox.style.color = "red";
+	}
+}
+
+function handleHint() {
+	let deleteCells = getHint();
+	for (cell of deleteCells) {
+		removeCell(cell, map, regionOccupied, rowOccupied, columnOccupied, edgeOccupied);
+	}
+	updateBoard();
+	messageBox.textContent = `You were right upto this point ,
+Try adding :, ${hintArray[totalQueen]}`;
+	messageBox.style.color = "purple"
+}
+
+let inputBox = document.querySelector("#gridSizeInput");
+let gameButton = document.querySelector("#gameGenerateButton");
+let hintButton = document.querySelector("#hintButton");
+let board = document.querySelector("#board");
+let messageBox = document.querySelector("#message");
+gameButton.addEventListener("click", handleUserInput);

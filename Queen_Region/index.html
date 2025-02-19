@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<style>
+            *{
+                font-family: cursive;
+            }
+			.body {
+				display: flex;
+				margin: 0px;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				flex-direction: column;
+			}
+			.input {
+				margin-bottom: 20px;
+				width: 330px;
+				height: auto;
+				font-size: larger;
+			}
+			.cell {
+				width: 65px;
+				height: 65px;
+				border: 2px solid black;
+			}
+            
+			.board {
+				display: flex;
+				flex-direction: column;
+				text-align: center;
+				font-size: 40px;
+				margin-bottom: 30px;
+				margin-top: 30px;
+			}
+            .board:hover{
+                cursor: pointer;
+            }
+			.row {
+				display: flex;
+			}
+			.message {
+				font-size: 24px;
+			}
+            .btn{
+                font-size: larger;
+            }
+            .inputFields{
+                display: flex;
+                flex-direction: column;
+                text-align: center;
+            }
+        
+		</style>
+	</head>
+	<body class="body">
+		<div class="inputFields">
+            <form onsubmit="event.preventDefault()">
+                <input
+                    class="input"
+                    type="number"
+                    placeholder="Enter size of the grid from 5 to 9"
+                    id="gridSizeInput"
+                />
+                <input type="submit" value="Generate Game" id="gameGenerateButton" class="btn">
+            </form>
+            <form onsubmit="event.preventDefault()">
+                <input type="submit" value="Get Hint" class="btn" id="hintButton">
+            </form>
+		</div>
+		<div class="board" id="board"></div>
+		<div class = "message" id="message"></div>
+		<script src="queen_solution.js"></script>
+	</body>
+</html>
