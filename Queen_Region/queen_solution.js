@@ -38,35 +38,6 @@ function updateValidity(obj, loc, region, row, column, edge) {
 	}
 }
 
-function printSolutionMatrix(matrix) {
-	const cellWidth = 12;
-	const emptyCell = " ".repeat(cellWidth);
-	const numRows = matrix.length;
-	const numCols = matrix[0].length;
-	``;
-	const colIndices = Array.from({ length: numCols }, (_, i) =>
-		i.toString().padStart(cellWidth)
-	);
-	console.log(" ".repeat(6) + colIndices.join(" | "));
-
-	const rowSeparator = "-".repeat(numCols * (cellWidth + 3));
-	console.log(rowSeparator);
-
-	for (let i = 0; i < numRows; i++) {
-		const rowLabel = i.toString().padEnd(6);
-		console.log(
-			rowLabel +
-				matrix[i]
-					.map((cell, j) =>
-						cell === null
-							? emptyCell
-							: `(${i},${j}) ${cell}`.padStart(cellWidth)
-					)
-					.join(" | ")
-		);
-		console.log(rowSeparator);
-	}
-}
 
 function updateEdgeValidity(markedEdges, row, col) {
 	let arr = [
@@ -241,9 +212,6 @@ function getRandomBoard() {
 			break;
 		}
 	}
-
-	console.log("SOLUTION FOR THIS RANDOM PUZZLE");
-	printSolutionMatrix(matrix);
 	copyArray = JSON.parse(JSON.stringify(matrix));
 	insertRegions(matrix, availablePosition);
 	return matrix;
