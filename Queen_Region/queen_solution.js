@@ -305,9 +305,9 @@ function handleCellClick(event) {
 function startGame() {
 	resetBoard();
 	messageBox.textContent = "";
-	board.style.height = inputBox.value * 65 + "px";
-	board.style.width = inputBox.value * 65 + "px";
 	gridSize = inputBox.value;
+	board.style.height = gridSize * 65 + "px";
+	board.style.width = gridSize * 65 + "px";
 	map = makeBoard();
 	board.addEventListener("click", handleCellClick);
 	hintButton.addEventListener("click" , handleHint);
@@ -362,7 +362,8 @@ function resetBoard() {
 function handleUserInput() {
 	if (inputBox.value >= 5 && inputBox.value <= 9) {
 		startGame();
-	} else {
+	} 
+	else {
 		messageBox.textContent = "Please enter number between 5 and 9";
 		messageBox.style.color = "red";
 	}
@@ -375,7 +376,7 @@ function handleHint() {
 	}
 	updateBoard();
 	messageBox.textContent = `You were right upto this point ,
-Try adding :, ${hintArray[totalQueen]}`;
+Try adding : ${hintArray[totalQueen]}`;
 	messageBox.style.color = "purple"
 }
 
