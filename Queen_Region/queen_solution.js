@@ -1,4 +1,7 @@
+// -------------------- Utility Functions --------------------
+
 function removeOneFromArray(arr, value) {
+	// Removes first occurrence of value from array
 	let index = arr.indexOf(value);
 	if (index !== -1) {
 		arr.splice(index, 1);
@@ -6,7 +9,40 @@ function removeOneFromArray(arr, value) {
 	return arr;
 }
 
+function makeNullMatrix() {
+	// Creates a gridSize x gridSize matrix initialized with null values
+	let matrix = [];
+	for (let i = 0; i < gridSize; i++) {
+		let arr = [];
+		for (let j = 0; j < gridSize; j++) {
+			arr.push(null);
+		}
+		matrix.push(arr);
+	}
+	return matrix;
+}
+
+function indexFromPosition(num) {
+	// Converts linear position to 2D grid coordinates
+	return [Math.floor(num / gridSize), num % gridSize];
+}
+
+// -------------------- Game State Variables --------------------
+
+let regionOccupied = new Set();
+let rowOccupied = new Set();
+let columnOccupied = new Set();
+let edgeOccupied = [];
+let map;
+let gridSize;
+let copyArray;
+let totalQueen = 0;
+let hintArray = [];
+
+// -------------------- Game Logic: Validation Functions --------------------
+
 function checkValidityOfCell(obj, loc, region, row, column, edge) {
+	// Checks if a queen can be placed at the given location
 	return (
 		region.has(obj.color) ||
 		row.has(loc[0]) ||
@@ -16,10 +52,12 @@ function checkValidityOfCell(obj, loc, region, row, column, edge) {
 }
 
 function checkEdgeValidity(edges, loc) {
+	// Checks if the location is in the diagonal attack range of any queen
 	return edges.includes(loc);
 }
 
 function updateValidity(obj, loc, region, row, column, edge) {
+	// Updates the game state after placing a queen
 	region.add(obj.color);
 	row.add(loc[0]);
 	column.add(loc[2]);
@@ -38,8 +76,8 @@ function updateValidity(obj, loc, region, row, column, edge) {
 	}
 }
 
-
 function updateEdgeValidity(markedEdges, row, col) {
+	// Updates diagonal attack positions for solution generation
 	let arr = [
 		[row + 1, col + 1],
 		[row - 1, col + 1],
@@ -52,56 +90,10 @@ function updateEdgeValidity(markedEdges, row, col) {
 	}
 }
 
-function removeCell(cell, map, region, row, column, edges) {
-	let r = parseInt(cell[0]);
-	let c = parseInt(cell[1]);
-	let x = map.get(`${r},${c}`);
-	x.haveQueen = false;
-	totalQueen--;
-	row.delete(`${r}`);
-	column.delete(`${c}`);
-	region.delete(x.color);
-	let removeEdges = [
-		`${r - 1},${c - 1}`,
-		`${r + 1},${c + 1}`,
-		`${r - 1},${c + 1}`,
-		`${r + 1},${c - 1}`,
-	];
-	for (let edge of removeEdges) {
-		removeOneFromArray(edges, edge);
-	}
-}
-
-function askQuestionsTillTrue(map, region, row, column, edge, id) {
-	let obj;
-	let loc = id;
-	let queenPlaced = false;
-
-	obj = map.get(loc);
-	if (!checkValidityOfCell(obj, loc, region, row, column, edge)) {
-		queenPlaced = true;
-	}
-
-	return { obj, loc, queenPlaced };
-}
-
-function makeNullMatrix() {
-	let matrix = [];
-	for (let i = 0; i < gridSize; i++) {
-		let arr = [];
-		for (let j = 0; j < gridSize; j++) {
-			arr.push(null);
-		}
-		matrix.push(arr);
-	}
-	return matrix;
-}
-
-function indexFromPosition(num) {
-	return [Math.floor(num / gridSize), num % gridSize];
-}
+// -------------------- Game Logic: Board Generation --------------------
 
 function addColorFromBoundry(matrix, cell) {
+	// Assigns color to a cell based on neighboring cells
 	let [row, col] = indexFromPosition(cell, gridSize);
 	let boundries = [
 		[row - 1, col],
@@ -138,6 +130,7 @@ function generateRandomSolutionWithoutRegions(
 	markedEdges,
 	colors
 ) {
+	// Generates initial queen positions without considering regions
 	for (let col = 0; col < gridSize; col++) {
 		let row;
 		let attempts = 0;
@@ -161,6 +154,7 @@ function generateRandomSolutionWithoutRegions(
 }
 
 function insertRegions(matrix, availablePosition) {
+	// Fills remaining cells with colors to create regions
 	while (availablePosition.length > 0) {
 		let cellIndex = Math.floor(Math.random() * availablePosition.length);
 		let cell = availablePosition[cellIndex];
@@ -176,6 +170,7 @@ function insertRegions(matrix, availablePosition) {
 }
 
 function getRandomBoard() {
+	// Generates a complete random board with solution
 	let matrix;
 	let availablePosition;
 	while (true) {
@@ -218,6 +213,7 @@ function getRandomBoard() {
 }
 
 function makeBoard() {
+	// Creates the game board with initial state
 	const map = new Map();
 	let colors = getRandomBoard();
 
@@ -229,7 +225,45 @@ function makeBoard() {
 	return map;
 }
 
+// -------------------- Game Logic: Gameplay Functions --------------------
+
+function removeCell(cell, map, region, row, column, edges) {
+	// Removes a queen from the board and updates game state
+	let r = parseInt(cell[0]);
+	let c = parseInt(cell[1]);
+	let x = map.get(`${r},${c}`);
+	x.haveQueen = false;
+	totalQueen--;
+	row.delete(`${r}`);
+	column.delete(`${c}`);
+	region.delete(x.color);
+	let removeEdges = [
+		`${r - 1},${c - 1}`,
+		`${r + 1},${c + 1}`,
+		`${r - 1},${c + 1}`,
+		`${r + 1},${c - 1}`,
+	];
+	for (let edge of removeEdges) {
+		removeOneFromArray(edges, edge);
+	}
+}
+
+function askQuestionsTillTrue(map, region, row, column, edge, id) {
+	// Validates queen placement attempt
+	let obj;
+	let loc = id;
+	let queenPlaced = false;
+
+	obj = map.get(loc);
+	if (!checkValidityOfCell(obj, loc, region, row, column, edge)) {
+		queenPlaced = true;
+	}
+
+	return { obj, loc, queenPlaced };
+}
+
 function getHint() {
+	// Generates hint based on the solution
 	let bool = false;
 	let removeArray = [];
 	for (let col = 0; col < gridSize; col++) {
@@ -252,7 +286,10 @@ function getHint() {
 	return removeArray;
 }
 
+// -------------------- UI Event Handlers --------------------
+
 function handleCellClick(event) {
+	// Handles cell clicks for queen placement/removal
 	if (event.target.className == "cell") {
 		let id = event.target.id;
 		if (map.get(id).haveQueen) {
@@ -275,7 +312,6 @@ function handleCellClick(event) {
 			edgeOccupied,
 			id
 		);
-		// This function is checking until user entered proper queen
 		if (queenPlaced) {
 			updateValidity(
 				obj,
@@ -302,7 +338,39 @@ function handleCellClick(event) {
 	}
 }
 
+function handleHint() {
+	// Handles hint button clicks
+	let deleteCells = getHint();
+	for (cell of deleteCells) {
+		removeCell(
+			cell,
+			map,
+			regionOccupied,
+			rowOccupied,
+			columnOccupied,
+			edgeOccupied
+		);
+	}
+	updateBoard();
+	messageBox.textContent = `You were right upto this point ,
+Try adding : ${hintArray[totalQueen]}`;
+	messageBox.style.color = "purple";
+}
+
+function handleUserInput() {
+	// Validates and handles user input for grid size
+	if (inputBox.value >= 5 && inputBox.value <= 9) {
+		startGame();
+	} else {
+		messageBox.textContent = "Please enter number between 5 and 9";
+		messageBox.style.color = "red";
+	}
+}
+
+// -------------------- Game Management Functions --------------------
+
 function startGame() {
+	// Initializes a new game
 	resetBoard();
 	messageBox.textContent = "";
 	gridSize = inputBox.value;
@@ -310,43 +378,12 @@ function startGame() {
 	board.style.width = gridSize * 65 + "px";
 	map = makeBoard();
 	board.addEventListener("click", handleCellClick);
-	hintButton.addEventListener("click" , handleHint);
+	hintButton.addEventListener("click", handleHint);
 	updateBoard();
-}
-let regionOccupied = new Set();
-let rowOccupied = new Set();
-let columnOccupied = new Set();
-let edgeOccupied = [];
-let map;
-let gridSize;
-let copyArray;
-let totalQueen = 0;
-let hintArray = [];
-
-// Taking input from the user :
-
-function updateBoard() {
-	board.innerHTML = "";
-	for (let i = 0; i < gridSize; i++) {
-		let row = document.createElement("div");
-		row.className = "row";
-		for (let j = 0; j < gridSize; j++) {
-			let obj = map.get(`${i},${j}`);
-
-			let cell = document.createElement("div");
-			cell.classList.add("cell");
-			cell.style.background = obj.color;
-			cell.id = `${i},${j}`;
-			if(obj.haveQueen){
-				cell.textContent = "👑"
-			}
-			row.appendChild(cell);
-		}
-		board.appendChild(row);
-	}
 }
 
 function resetBoard() {
+	// Resets all game state variables
 	map = undefined;
 	gridSize = undefined;
 	copyArray = undefined;
@@ -359,26 +396,29 @@ function resetBoard() {
 	edgeOccupied = [];
 }
 
-function handleUserInput() {
-	if (inputBox.value >= 5 && inputBox.value <= 9) {
-		startGame();
-	} 
-	else {
-		messageBox.textContent = "Please enter number between 5 and 9";
-		messageBox.style.color = "red";
+function updateBoard() {
+	// Updates the visual representation of the board
+	board.innerHTML = "";
+	for (let i = 0; i < gridSize; i++) {
+		let row = document.createElement("div");
+		row.className = "row";
+		for (let j = 0; j < gridSize; j++) {
+			let obj = map.get(`${i},${j}`);
+
+			let cell = document.createElement("div");
+			cell.classList.add("cell");
+			cell.style.background = obj.color;
+			cell.id = `${i},${j}`;
+			if (obj.haveQueen) {
+				cell.textContent = "👑";
+			}
+			row.appendChild(cell);
+		}
+		board.appendChild(row);
 	}
 }
 
-function handleHint() {
-	let deleteCells = getHint();
-	for (cell of deleteCells) {
-		removeCell(cell, map, regionOccupied, rowOccupied, columnOccupied, edgeOccupied);
-	}
-	updateBoard();
-	messageBox.textContent = `You were right upto this point ,
-Try adding : ${hintArray[totalQueen]}`;
-	messageBox.style.color = "purple"
-}
+// -------------------- DOM Elements and Event Listeners --------------------
 
 let inputBox = document.querySelector("#gridSizeInput");
 let gameButton = document.querySelector("#gameGenerateButton");
