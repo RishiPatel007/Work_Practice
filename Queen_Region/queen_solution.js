@@ -263,27 +263,29 @@ function askQuestionsTillTrue(map, region, row, column, edge, id) {
 }
 
 function getHint() {
-	// Generates hint based on the solution
-	let bool = false;
 	let removeArray = [];
+	let hintCol;
 	for (let col = 0; col < gridSize; col++) {
+		let isColEmpty = true; // checks if this column is empty or not (in both cases removed and not removed)
 		for (let row = 0; row < gridSize; row++) {
 			let x = map.get(`${row},${col}`);
-			if (copyArray[row][col] != null) {
+			if (hintArray.length < gridSize && copyArray[row][col] != null) {
 				hintArray.push([row, col]);
 			}
 			if (x.haveQueen) {
-				if (copyArray[row][col] == null && !bool) {
-					bool = true;
-					x;
-				}
-				if (bool) {
+				if (copyArray[row][col] == null) {
 					removeArray.push([row, col]);
+					isColEmpty = true; // if removed , that column is empty
+				} else {
+					isColEmpty = false; // if not removed and this column have queen than column is not empty
 				}
 			}
 		}
+		if (hintCol === undefined && isColEmpty) {
+			hintCol = col;
+		}
 	}
-	return removeArray;
+	return [removeArray, hintCol];
 }
 
 // -------------------- UI Event Handlers --------------------
@@ -340,7 +342,7 @@ function handleCellClick(event) {
 
 function handleHint() {
 	// Handles hint button clicks
-	let deleteCells = getHint();
+	let [deleteCells, hintCol] = getHint();
 	for (cell of deleteCells) {
 		removeCell(
 			cell,
@@ -352,8 +354,10 @@ function handleHint() {
 		);
 	}
 	updateBoard();
+	let hint = hintArray[hintCol];
+
 	messageBox.textContent = `You were right upto this point ,
-Try adding : ${hintArray[totalQueen]}`;
+Try adding : ${hint}`;
 	messageBox.style.color = "purple";
 }
 
