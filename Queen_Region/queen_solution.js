@@ -38,6 +38,9 @@ let gridSize;
 let copyArray;
 let totalQueen = 0;
 let hintArray = [];
+let timeInSeconds = 0;
+let time = { seconds: 0, minutes: 0, hours: 0 };
+let intervalId = 0
 
 // -------------------- Game Logic: Validation Functions --------------------
 
@@ -333,10 +336,12 @@ function handleCellClick(event) {
 		}
 	}
 	if (totalQueen == gridSize) {
-		messageBox.textContent = "! Congratulation You Win !";
+		messageBox.textContent = `! Congratulation You Solved it in ${timer.textContent}!`;
+		timer.textContent = ""
 		messageBox.style.color = "green";
 		board.removeEventListener("click", handleCellClick);
 		hintButton.removeEventListener("click", handleHint);
+		clearInterval(intervalId)
 	}
 }
 
@@ -376,6 +381,8 @@ function handleUserInput() {
 function startGame() {
 	// Initializes a new game
 	resetBoard();
+	
+	startTime()
 	messageBox.textContent = "";
 	gridSize = inputBox.value;
 	board.style.height = gridSize * 65 + "px";
@@ -398,6 +405,8 @@ function resetBoard() {
 	rowOccupied = new Set();
 	columnOccupied = new Set();
 	edgeOccupied = [];
+	time = { seconds: 0, minutes: 0, hours: 0 };
+	clearInterval(intervalId)
 }
 
 function updateBoard() {
@@ -422,6 +431,34 @@ function updateBoard() {
 	}
 }
 
+// -------------------- Timer Functions --------------------
+function fixTwoDigitTime(num) {
+	if (num < 10) {
+		return `0${num}`;
+	}
+	return `${num}`;
+}
+
+function updateTime() {
+	timer.textContent = `${fixTwoDigitTime(time.hours)}:${fixTwoDigitTime(
+		time.minutes
+	)}:${fixTwoDigitTime(time.seconds)}`;
+}
+
+function startTime() {
+	intervalId = setInterval(() => {
+		time.seconds++;
+		if (time.seconds == 60) {
+			time.seconds = 0;
+			time.minutes++;
+		}
+		if (time.minutes == 60) {
+			time.minutes = 0;
+			time.hours++;
+		}
+		updateTime();
+	}, 1000 * 1);
+}
 // -------------------- DOM Elements and Event Listeners --------------------
 
 let inputBox = document.querySelector("#gridSizeInput");
@@ -429,4 +466,6 @@ let gameButton = document.querySelector("#gameGenerateButton");
 let hintButton = document.querySelector("#hintButton");
 let board = document.querySelector("#board");
 let messageBox = document.querySelector("#message");
+let timer = document.querySelector("#timer");
+
 gameButton.addEventListener("click", handleUserInput);
