@@ -1,0 +1,20 @@
+[
+	{
+		"iId": "c7468c40-0574-11f0-afd5-9f27af2e0190",
+		"sName": "item2",
+		"nQuantity": 1000,
+		"nPrice": 100,
+		"sStatus": "inactive",
+		"dCreatedAt": "2025-03-20T10:19:16.614Z",
+		"dUpdatedAt": "2025-03-20T10:19:16.614Z"
+	},
+	{
+		"iId": "8b011770-0581-11f0-95a0-0189cb3fe927",
+		"sName": "item02",
+		"nQuantity": 1000,
+		"nPrice": 100,
+		"sStatus": "inactive",
+		"dCreatedAt": "2025-03-20T11:50:38.952Z",
+		"dUpdatedAt": "2025-03-20T11:50:38.952Z"
+	}
+]
